@@ -89,6 +89,8 @@ public static void Run(EventGridEvent eventGridEvent, Stream outputBlob, ILogger
 }
 ```
 
+Note that Event Grid needs to know of subscribers and so when a function is integrated with an Event Grid Topic, this sets up this subscription process as part of the integration of the Azure Function workflow. Logic App consumption also automates this process. However, Logic App Standard does not automate this process and must be done separately - otherwise no events will be sent to the Logic App. See this [tech community](https://techcommunity.microsoft.com/t5/azure-integration-services-blog/using-single-tenant-logic-app-workflow-endpoint-as-event-grid/ba-p/3055814) article that explains more on this. Using Azure Functions side-steps this issue.  
+
 ## Normal, public-facing endpoints
 
 It is really straightforward to build this archecture if all elements are public-facing.
