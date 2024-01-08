@@ -37,3 +37,16 @@ def create_eventgrid_topic():
 
     return {"message": "Event sent successfully"}
 ```
+
+Calling this API, using the HTTP REST Client in VS Code.
+
+```
+POST https://<YOUR_APP_SERVICE_NAME>.azurewebsites.net/create_eventgrid_topic
+Content-Type: application/json
+
+{
+    "topic_name": "testing event grid Friday private afternoon",
+    "resource_group_name": "grid-demo-rg",
+    "location": "West Europe"
+}
+```
