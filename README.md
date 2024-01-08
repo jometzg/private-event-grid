@@ -105,4 +105,9 @@ This is where private endpoints present an issue. By default, a *subscriber* to 
 
 The only means by which that can be built is to pull events from Event Grid and then resend these events to a private endpoint (this would also require that the pulling mechanism is itself hosted in a VNet. This could be a time-triggered Function/Logic App or some console app inside Container Apps/ACA/AKS. This is explained in the document [here](https://learn.microsoft.com/en-us/azure/event-grid/pull-delivery-overview#next-steps)
 
-![alt text]([https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png](https://learn.microsoft.com/en-us/azure/event-grid/includes/media/differences-between-consumption-modes/push-pull-delivery-mechanism.png#lightbox)
+![alt text](https://learn.microsoft.com/en-us/azure/event-grid/includes/media/differences-between-consumption-modes/push-pull-delivery-mechanism.png "Push versus Pull")
+
+# Summary
+Attempts to use Event Grid Topics with platform (PaaS) services and a security model limits public network access, presents challenges the Azure architecture. 
+
+This is mainly around the consumption or subsription side to these events. At this point in time (without an equivalent of VNet integration feature for Event Grid Topics), the messages can only be consumed by a pull model. One simple approach being a time scheduled funtion that pulls messages from the Event Grid Topic and then either consumes these directly or forwards these to another Azure service e.g. another Azure Function.
