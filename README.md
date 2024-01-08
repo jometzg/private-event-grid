@@ -112,4 +112,4 @@ The only means by which that can be built is to pull events from Event Grid and 
 # Summary
 Attempts to use Event Grid Topics with platform (PaaS) services and a security model limits public network access, presents challenges the Azure architecture. 
 
-This is mainly around the consumption or subsription side to these events. At this point in time (without an equivalent of VNet integration feature for Event Grid Topics), the messages can only be consumed by a pull model. One simple approach being a time scheduled funtion that pulls messages from the Event Grid Topic and then either consumes these directly or forwards these to another Azure service e.g. another Azure Function.
+This is mainly around the consumption or subsription side to these events. At this point in time (without an equivalent of VNet integration feature for Event Grid Topics), the events can only be consumed by a pull model. One simple approach being a time-scheduled function that pulls events from the Event Grid Topic and then either consumes these directly or forwards these to another Azure service e.g. another Azure Function.
