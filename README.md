@@ -10,13 +10,21 @@ Azure [Event Grid](https://learn.microsoft.com/en-us/azure/event-grid/overview) 
 
 Event Grid supports [private endpoints](https://learn.microsoft.com/en-us/azure/event-grid/configure-private-endpoints). 
 
+## What has been learned
+
+There are some caveats when it comes to using Event Grid Topics with Private Endpoints. Firstly, if an Event Grid Topic has a private endpoint (and public access disallowed), then the sender needs to be VNet integrated in order to send events. This is simple with many services. For the App Service, it just needs to be [VNet integrated](https://learn.microsoft.com/en-us/azure/app-service/configure-vnet-integration-enable) into a VNet that has visisbility on the Event Grid Topic's private endpoint (e.g. the same VNet).
+
+Where things get more complicated is for potential subscribers of the events from the Event Grid Topics. Because a subscriber event would normally be *pushed* from the Event Grid serice, if the subscriber is itself private, then the Event Grid will not have visibility to push these events to a service with a private endpoint. From a networking perspective, the inbound requests to an Event Grid Topic is the only thing that can currently be amended. Outbound from the Event Grid there is no equivalent to App Service [VNet integration](https://learn.microsoft.com/en-us/azure/app-service/configure-vnet-integration-enable) that allows outbound events from an Event Grid Topic that can therefore push events to a private endpoint.
+
+To counter this, there is a means of *pulling* events from an Event Grid Topic. This is described [here](https://learn.microsoft.com/en-us/azure/event-grid/event-grid-dotnet-get-started-pull-delivery#pull-messages-from-the-topic). This may mean that to be able to support this model, either a long-running console style application needs to be hosted in Azure that connects, pulls and then pushes to the target endpoint or a regularily triggered service like a time-triggered function. 
+
 
 ## Demonstration
 
 In order to demonstrate how well Event Grid works with private endpoints, there need to be a few moving parts:
 1. A means to send Event Grid events. For control over this, a [custom event grid topic](https://learn.microsoft.com/en-us/azure/event-grid/create-custom-topic) needs to be created
 2. An API hosted in Azure that can send these events.
-3. An Azure Virtual Network with a few subnets
+3. An Azure Virtual Network (VNet) with a few subnets
 4. A consumer of these events. This is a subscriber to the Event Grid Topics. An Azure Function was chosen for this as this can be [triggered](https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-event-grid-trigger?tabs=python-v2%2Cisolated-process%2Cnodejs-v4%2Cextensionv3&pivots=programming-language-csharp)  by Event Grid events
 5. Private endpoint for the Event Grid Topic
 6. VNet integration of the App Service hosting the event sender into the same VNet as the private endpoint for the Event Grid Topic.  
@@ -78,3 +86,23 @@ public static void Run(EventGridEvent eventGridEvent, Stream outputBlob, ILogger
     outputBlob.Write(bytes, 0, bytes.Length);
 }
 ```
+
+## Normal, public-facing endpoints
+
+It is really straightforward to build this archecture if all elements are public-facing.
+
+## Using Private Endpoints.
+
+This needs to be considered from the perspective of sending events and then receiving events. Assuming that a private endpoint is created on the Event Grid Topic and public-access disallowed.
+
+### Sending Events
+In order to send events, the event sending application needs VNet visibility to the private endpoint. This is pretty simple for any service that is infra-based or based on the App Service platform (Web Apps, Functions and Logic Apps Standard). As these can all be VNet integrated. It should be made clear that this capability is distinct from private endpoints in that VNet integration means the code running in your application sends requests from the subnet into which it is VNet integrated. So, if the Event Grid Topic's private endpoint is resolvable (and reachable) from the App Service's VNet, then the sender can send messages.
+
+It can be optionally decided whether this service itself needs a private endpoint. This will restrict client access to the sender (but not impact the VNet integration and therefore access to the Event Grid Topic.
+
+### Receiving Events
+This is where private endpoints present an issue. By default, a *subscriber* to an Event Grid Topic is called by Event Grid. If the receiving endpoint is private, then it is not reachable by Event Grid and so these test fail. An architecture could be built out where the Event Grid Topic is private, but not directly where the subscriber is private. At this time there is no means to get the Event Grid to send events to a private endpoint (or any endpoint hosted in a VNet). It is not clear whether this is a fucture capability.
+
+The only means by which that can be built is to pull events from Event Grid and then resend these events to a private endpoint (this would also require that the pulling mechanism is itself hosted in a VNet. This could be a time-triggered Function/Logic App or some console app inside Container Apps/ACA/AKS. This is explained in the document [here](https://learn.microsoft.com/en-us/azure/event-grid/pull-delivery-overview#next-steps)
+
+![alt text]([https://github.com/adam-p/markdown-here/raw/master/src/common/images/icon48.png](https://learn.microsoft.com/en-us/azure/event-grid/includes/media/differences-between-consumption-modes/push-pull-delivery-mechanism.png#lightbox)
