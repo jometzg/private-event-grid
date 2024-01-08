@@ -50,3 +50,19 @@ Content-Type: application/json
     "location": "West Europe"
 }
 ```
+
+## Consuming a custom Event Grid Topic
+
+```
+#r "Azure.Messaging.EventGrid"
+
+using Azure.Messaging.EventGrid;
+using System.Text;
+
+public static void Run(EventGridEvent eventGridEvent, Stream outputBlob, ILogger log)
+{
+    log.LogInformation(eventGridEvent.Subject.ToString());
+    byte[] bytes = Encoding.UTF8.GetBytes(eventGridEvent.Subject.ToString());
+    outputBlob.Write(bytes, 0, bytes.Length);
+}
+```
