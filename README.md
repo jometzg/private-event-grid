@@ -11,6 +11,16 @@ Azure [Event Grid](https://learn.microsoft.com/en-us/azure/event-grid/overview) 
 Event Grid supports [private endpoints](https://learn.microsoft.com/en-us/azure/event-grid/configure-private-endpoints). 
 
 
+## Demonstration
+
+In order to demonstrate how well Event Grid works with private endpoints, there need to be a few moving parts:
+1. A means to send Event Grid events. For control over this, a [custom event grid topic](https://learn.microsoft.com/en-us/azure/event-grid/create-custom-topic) needs to be created
+2. An API hosted in Azure that can send these events.
+3. An Azure Virtual Network with a few subnets
+4. A consumer of these events. This is a subscriber to the Event Grid Topics. An Azure Function was chosen for this as this can be [triggered](https://learn.microsoft.com/en-us/azure/azure-functions/functions-bindings-event-grid-trigger?tabs=python-v2%2Cisolated-process%2Cnodejs-v4%2Cextensionv3&pivots=programming-language-csharp)  by Event Grid events
+5. Private endpoint for the Event Grid Topic
+6. VNet integration of the App Service hosting the event sender into the same VNet as the private endpoint for the Event Grid Topic.  
+
 ## Publish a custom Event Grid Topic
 
 Below is a Python API that may be deployed to an Azure App Service that generates a custom topic event.
@@ -52,6 +62,8 @@ Content-Type: application/json
 ```
 
 ## Consuming a custom Event Grid Topic
+
+An Azure Function that is triggered by Event Grid with the code below. This merely takes some elements of the message and persists it as a new blob storage document.
 
 ```
 #r "Azure.Messaging.EventGrid"
