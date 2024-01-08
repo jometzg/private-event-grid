@@ -1,0 +1,44 @@
+### Create Event Grid Topic - local debug version
+POST http://127.0.0.1:5000/create_eventgrid_topic
+Content-Type: application/json
+
+{
+    "topic_name": "testing event grid stuff",
+    "resource_group_name": "grid-demo-rg",
+    "location": "West Europe"
+}
+
+### Create Event Grid Topic - app service version
+POST https://<YOUR_FUNCTION_APP>.azurewebsites.net/create_eventgrid_topic
+Content-Type: application/json
+
+{
+    "topic_name": "testing event grid Friday private afternoon",
+    "resource_group_name": "grid-demo-rg",
+    "location": "West Europe"
+}
+
+###
+GET http://localhost:7071/api/HttpTrigger2?name=John
+
+
+### send a request to the event grid topic directly over HTTP (data 
+POST https://XXXXXXX.westeurope-1.eventgrid.azure.net/api/events?api-version=2018-01-01
+aeg-sas-key: XXXXXXXX
+
+[
+  {
+    "topic": "/subscriptions/XXXXXX/resourceGroups/grid-demo-rg/providers/Microsoft.EventGrid/topics/jjtest",
+    "subject": "Testing",
+    "eventType": "JJTest called",
+    "eventTime": "2017-06-26T18:41:00.9584103Z",
+    "id": "831e1650-001e-001b-66ab-eeb76e069631",
+    "data": {
+      "topic_name": "testing event grid Friday private afternoon",
+       "resource_group_name": "grid-demo-rg",
+       "location": "West Europe"
+    },
+    "dataVersion": "1",
+    "metadataVersion": "1"
+  }
+]
