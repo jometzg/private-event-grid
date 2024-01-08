@@ -56,7 +56,9 @@ def create_eventgrid_topic():
     return {"message": "Event sent successfully"}
 ```
 
-Calling this API, using the HTTP REST Client in VS Code.
+Calling this API, using the HTTP REST Client in VS Code. 
+
+Note that this call uses a simplified approach of using key credendials. Best practices for this would mean amending the code could operate with *DefaultAzureCredentials*, but then managed identity will need to be used on the App Service and then a role assignment created to the Event Grid Topic. For inbound to this API, in production, a combination of authentication and private endpoint should also be used.
 
 ```
 POST https://<YOUR_APP_SERVICE_NAME>.azurewebsites.net/create_eventgrid_topic
