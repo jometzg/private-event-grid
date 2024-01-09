@@ -111,6 +111,8 @@ The only means by which that can be built is to pull events from Event Grid and 
 
 ![alt text](https://learn.microsoft.com/en-us/azure/event-grid/includes/media/differences-between-consumption-modes/push-pull-delivery-mechanism.png "Push versus Pull")
 
+> Note the above pull events design only works with Event Grid Topics that have been created in an Event Grid [Namespace](https://learn.microsoft.com/en-us/azure/event-grid/create-view-manage-namespaces) and not with standalone Event Grid Topics.
+
 # Summary
 Attempts to use Event Grid Topics with platform (PaaS) services and a security model limits public network access, presents challenges the Azure architecture. 
 
